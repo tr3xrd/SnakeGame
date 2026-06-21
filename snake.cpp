@@ -1,46 +1,45 @@
 #include "snake.hpp"
+#include <algorithm>
+#include <iostream>
 
 Snake::Snake() {
-    _nr_segments = 1;
-    _segments[0] = Point{0, 0};
+    _segments.push_back(Point(0, 0));
 }
 
-Snake::Snake(const Point &_position) {
-    _nr_segments = 1;
-    _segments[0] = _position;
+Snake::Snake(const Point& position) {
+    _segments.push_back(position);
 }
 
 void Snake::Move(Direction direction) {
-    for (int i = _nr_segments - 1; i > 0; i--) {
-        _segments[i] = _segments[i - 1];
-    }
-    switch (direction) {
-        case Direction::Top:
-            _segments[0].y -= 1;
-            break;
-        case Direction::Bottom:
-            _segments[0].y += 1;
-            break;
-        case Direction::Left:
-            _segments[0].x -= 1;
-            break;
-        case Direction::Right:
-            _segments[0].x += 1;
-            break;
-    }
+    Point head = _segments.front();
+
+    if (direction == Direction::Top)    head.y -= 1;
+    if (direction == Direction::Bottom) head.y += 1;
+    if (direction == Direction::Left)   head.x -= 1;
+    if (direction == Direction::Right)  head.x += 1;
+
+    _segments.insert(_segments.begin(), head);
+    _segments.pop_back();
+}
+
+void Snake::Eat(const Apple& apple) {
+    _segments.push_back(apple.GetPosition());
 }
 
 int Snake::GetSize() const {
-    return _nr_segments;
+    return static_cast<int>(_segments.size());
 }
 
 Point Snake::GetPosition() const {
-    return _segments[0];
+    return _segments.front();
 }
 
-void Snake::Eat(const Apple &apple) {
-    if (_nr_segments < 100) {
-        _segments[_nr_segments] = _segments[_nr_segments - 1];
-        _nr_segments++;
-    }
+bool Snake::ContainsPoint(const Point& p) const {
+    return std::find(_segments.begin(), _segments.end(), p) != _segments.end();
+}
+
+std::ostream& operator<<(std::ostream& out, const Snake& snake) {
+    out << "Snake size: " << snake.GetSize()
+        << " Head: " << snake.GetPosition();
+    return out;
 }
