@@ -40,5 +40,14 @@ main.o:
 SnakeGame: libs game_engine.o main.o
 	g++ -o Snake.exe game_engine.o main.o -L. -lapple -lboard -lsnake -lpainter -lpoint -ldirection $(SFML_LIB) -std=c++17
 
+tests/tests.o:
+	g++ tests/tests.cpp -o tests/tests.o -c -std=c++17 $(INCLUDES)
+
+tests.exe: libs tests/tests.o
+	g++ -o tests.exe tests/tests.o -L. -lapple -lboard -lsnake -lpoint -ldirection -std=c++17
+
+test: tests.exe
+	.\tests.exe
+
 clean:
-	rm -f *.o *.exe *.a libs/*/*.o
+	rm -f *.o *.exe *.a libs/*/*.o tests/*.o
