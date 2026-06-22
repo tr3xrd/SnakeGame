@@ -1,22 +1,35 @@
 #include "game_engine.hpp"
-#include <iostream>
 
-GameEngine::GameEngine() : _status("ready") {}
+GameEngine::GameEngine()
+    : _window(sf::VideoMode({400, 400}), "Snake Game") {
+    _painter = std::make_unique<Painter>(_window);
+}
 
 void GameEngine::Init() {
-    std::cout << "Game initialized. Status: " << _status << std::endl;
-    std::cout << "Board: " << _board << std::endl;
-    std::cout << "Snake: " << _snake << std::endl;
-    std::cout << "Apple at: " << _apple << std::endl;
+    // initializare snake, board, apple daca e nevoie
 }
 
 void GameEngine::Run() {
-    _status = "running";
-    std::cout << "Game running..." << std::endl;
+    while (_window.isOpen()) {
+        while (const std::optional<sf::Event> event = _window.pollEvent()) {
+            if (event->is<sf::Event::Closed>()) {
+                _window.close();
+            }
 
-    Direction dir = Direction::Right;
-    std::cout << "Direction: " << dir << std::endl;
+            if (const auto* keyPressed = event->getIf<sf::Event::KeyPressed>()) {
+                if (keyPressed->scancode == sf::Keyboard::Scan::Up)
+                    _snake.Move(Direction::Top);
+                else if (keyPressed->scancode == sf::Keyboard::Scan::Down)
+                    _snake.Move(Direction::Bottom);
+                else if (keyPressed->scancode == sf::Keyboard::Scan::Left)
+                    _snake.Move(Direction::Left);
+                else if (keyPressed->scancode == sf::Keyboard::Scan::Right)
+                    _snake.Move(Direction::Right);
+            }
+        }
 
-    _snake.Move(dir);
-    std::cout << "After move: " << _snake << std::endl;
+        _window.clear(sf::Color::Black);
+        // _painter->DrawImage(...) aici
+        _window.display();
+    }
 }
